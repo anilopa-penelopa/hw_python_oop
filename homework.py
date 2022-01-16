@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from typing import Dict
 
 
-def format_for_template(template_string: str, parameters: Dict[str, float]) -> str:
+def format_for_template(template_string: str,
+                        parameters: Dict[str, float]) -> str:
     return (template_string.format(**parameters))
 
 
@@ -81,11 +82,11 @@ class Running(Training):
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий на тренеровке "Бег"."""
         duration_minutes = self.duration * self.MINUTES_PER_HOUR
-        calories: float = (
-                (self.COEFF_CALORIE_RUN_1 * self.get_mean_speed() - self.COEFF_CALORIE_RUN_2)
-                * self.weight / self.METERS_IN_KM
-                * duration_minutes
-        )
+        calories: float = ((self.COEFF_CALORIE_RUN_1 * self.get_mean_speed()
+                            - self.COEFF_CALORIE_RUN_2)
+                           * self.weight / self.METERS_IN_KM
+                           * duration_minutes
+                           )
         return calories
 
 
@@ -146,9 +147,9 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: list[float]) -> Training:
     """Чтение данных, полученных с датчиков."""
-    dict_trainings: {str: str} = {'SWM': Swimming,
-                      'RUN': Running,
-                      'WLK': SportsWalking}
+    dict_trainings: Dict[str, str] = {'SWM': Swimming,
+                                      'RUN': Running,
+                                      'WLK': SportsWalking}
     training_name = dict_trainings[workout_type]
     return training_name(*data)
 
