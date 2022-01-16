@@ -3,7 +3,7 @@ from typing import Dict, List, Union, Type
 
 
 def format_for_template(template_string: str,
-                        parameters: Dict[str, float]) -> str:
+                        parameters: Dict[str, str]) -> str:
     return (template_string.format(**parameters))
 
 
@@ -147,10 +147,10 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: List[float]) -> Training:
     """Чтение данных, полученных с датчиков."""
-    dict_trainings: Dict[str,  Type[Union[Swimming, Running, SportsWalking]]] = \
-        {'SWM': Swimming,
-         'RUN': Running,
-         'WLK': SportsWalking}
+    dict_trainings: Dict[str, Type[Union[Swimming, Running, SportsWalking]]] \
+        = {'SWM': Swimming,
+           'RUN': Running,
+            'WLK': SportsWalking}
     training_name = dict_trainings[workout_type]
     return training_name(*data)
 
