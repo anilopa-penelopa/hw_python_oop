@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, List, Union, Type
 
 
 def format_for_template(template_string: str,
@@ -17,7 +17,7 @@ class InfoMessage:
     calories: float
 
     def get_message(self) -> str:
-        parameters = {
+        parameters: Dict[str, str] = {
             'training_type': self.training_type,
             'duration': format(self.duration, '.3f'),
             'distance': format(self.distance, '.3f'),
@@ -37,7 +37,7 @@ class InfoMessage:
 class Training:
     """Базовый класс тренировки."""
     LEN_STEP: float = 0.65
-    METERS_IN_KM: int = 1000
+    M_IN_KM: int = 1000
     MINUTES_PER_HOUR: int = 60
 
     def __init__(self,
@@ -51,7 +51,7 @@ class Training:
 
     def get_distance(self) -> float:
         """Получить дистанцию в км."""
-        distance = self.action * self.LEN_STEP / self.METERS_IN_KM
+        distance = self.action * self.LEN_STEP / self.M_IN_KM
         return distance
 
     def get_mean_speed(self) -> float:
@@ -84,7 +84,7 @@ class Running(Training):
         duration_minutes = self.duration * self.MINUTES_PER_HOUR
         calories: float = ((self.COEFF_CALORIE_RUN_1 * self.get_mean_speed()
                             - self.COEFF_CALORIE_RUN_2)
-                           * self.weight / self.METERS_IN_KM
+                           * self.weight / self.M_IN_KM
                            * duration_minutes
                            )
         return calories
@@ -134,7 +134,7 @@ class Swimming(Training):
     def get_mean_speed(self) -> float:
         """Получить среднюю скорость движения в тренировке "Плавание"."""
         distance_meters = self.length_pool * self.count_pool
-        distance_km = distance_meters / self.METERS_IN_KM
+        distance_km = distance_meters / self.M_IN_KM
         mean_speed = distance_km / self.duration
         return mean_speed
 
@@ -145,11 +145,12 @@ class Swimming(Training):
         return calories
 
 
-def read_package(workout_type: str, data: list[float]) -> Training:
+def read_package(workout_type: str, data: List[float]) -> Training:
     """Чтение данных, полученных с датчиков."""
-    dict_trainings: Dict[str: str] = {'SWM': Swimming,
-                                      'RUN': Running,
-                                      'WLK': SportsWalking}
+    dict_trainings: Dict[str,  Type[Union[Swimming, Running, SportsWalking]]] = \
+        {'SWM': Swimming,
+         'RUN': Running,
+         'WLK': SportsWalking}
     training_name = dict_trainings[workout_type]
     return training_name(*data)
 
