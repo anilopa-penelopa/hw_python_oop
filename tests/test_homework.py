@@ -120,10 +120,10 @@ def test_Training():
     assert training.LEN_STEP == 0.65, (
         'Длина шага в классе `Training` должна быть равна 0.65'
     )
-    assert 'M_IN_KM' in list(training.__dict__), (
-        'Задайте атрибут `M_IN_KM` в классе `Training`'
+    assert 'METERS_IN_KM' in list(training.__dict__), (
+        'Задайте атрибут `METERS_IN_KM` в классе `Training`'
     )
-    assert training.M_IN_KM == 1000, (
+    assert training.METERS_IN_KM == 1000, (
         'В классе `Training` укажите правильное '
         'количество метров в километре: 1000'
     )
