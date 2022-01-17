@@ -1,10 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List, Union, Type
-
-
-def format_for_template(template_string: str,
-                        parameters: Dict[str, str]) -> str:
-    return (template_string.format(**parameters))
+from typing import Dict, List, Type
 
 
 @dataclass(init=True)
@@ -15,6 +10,13 @@ class InfoMessage:
     distance: float
     speed: float
     calories: float
+    template_string = (
+        'Тип тренировки: {training_type}; '
+        'Длительность: {duration} ч.; '
+        'Дистанция: {distance} км; '
+        'Ср. скорость: {speed} км/ч; '
+        'Потрачено ккал: {calories}.'
+    )
 
     def get_message(self) -> str:
         parameters: Dict[str, str] = {
@@ -24,14 +26,7 @@ class InfoMessage:
             'speed': format(self.speed, '.3f'),
             'calories': format(self.calories, '.3f')
         }
-        template_string = (
-            'Тип тренировки: {training_type}; '
-            'Длительность: {duration} ч.; '
-            'Дистанция: {distance} км; '
-            'Ср. скорость: {speed} км/ч; '
-            'Потрачено ккал: {calories}.'
-        )
-        return format_for_template(template_string, parameters)
+        return self.template_string.format(**parameters)
 
 
 class Training:
@@ -61,7 +56,7 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        pass
+        raise NotImplementedError
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -70,8 +65,13 @@ class Training:
         distance = self.get_distance()
         speed = self.get_mean_speed()
         calories = self.get_spent_calories()
-        return InfoMessage(training_type=training_type, duration=duration,
-                           distance=distance, speed=speed, calories=calories)
+        return InfoMessage(
+            training_type=training_type,
+            duration=duration,
+            distance=distance,
+            speed=speed,
+            calories=calories
+        )
 
 
 class Running(Training):
@@ -147,10 +147,12 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: List[float]) -> Training:
     """Чтение данных, полученных с датчиков."""
-    dict_trainings: Dict[str, Type[Union[Swimming, Running, SportsWalking]]] \
+    dict_trainings: Dict[str, Type[Training]] \
         = {'SWM': Swimming,
            'RUN': Running,
-            'WLK': SportsWalking}
+           'WLK': SportsWalking}
+    if not dict_trainings[workout_type]:
+        raise KeyError
     training_name = dict_trainings[workout_type]
     return training_name(*data)
 
@@ -169,5 +171,8 @@ if __name__ == '__main__':
     ]
 
     for workout_type, data in packages:
-        training = read_package(workout_type, data)
+        training = read_package(
+            workout_type=workout_type,
+            data=data
+        )
         main(training)
