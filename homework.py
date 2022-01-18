@@ -10,23 +10,24 @@ class InfoMessage:
     distance: float
     speed: float
     calories: float
-    template_string = (
+
+    template_info_message = (
         'Тип тренировки: {training_type}; '
-        'Длительность: {duration} ч.; '
-        'Дистанция: {distance} км; '
-        'Ср. скорость: {speed} км/ч; '
-        'Потрачено ккал: {calories}.'
+        'Длительность: {duration:.3f} ч.; '
+        'Дистанция: {distance:.3f} км; '
+        'Ср. скорость: {speed:.3f} км/ч; '
+        'Потрачено ккал: {calories:.3f}.'
     )
 
     def get_message(self) -> str:
         parameters: Dict[str, str] = {
             'training_type': self.training_type,
-            'duration': format(self.duration, '.3f'),
-            'distance': format(self.distance, '.3f'),
-            'speed': format(self.speed, '.3f'),
-            'calories': format(self.calories, '.3f')
+            'duration': self.duration,
+            'distance': self.distance,
+            'speed': self.speed,
+            'calories': self.calories
         }
-        return self.template_string.format(**parameters)
+        return self.template_info_message.format(**parameters)
 
 
 class Training:
@@ -147,14 +148,17 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: List[float]) -> Training:
     """Чтение данных, полученных с датчиков."""
-    dict_trainings: Dict[str, Type[Training]] \
-        = {'SWM': Swimming,
-           'RUN': Running,
-           'WLK': SportsWalking}
-    if not dict_trainings[workout_type]:
-        raise KeyError
-    training_name = dict_trainings[workout_type]
-    return training_name(*data)
+    dict_trainings: Dict[str, Type[Training]] = {
+        'SWM': Swimming,
+        'RUN': Running,
+        'WLK': SportsWalking
+    }
+    try:
+        if workout_type in dict_trainings:
+            training_name = dict_trainings[workout_type]
+            return training_name(*data)
+    except ValueError:
+        print(f'{workout_type} is not in dict_trainings')
 
 
 def main(training: Training) -> None:
