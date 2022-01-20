@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Dict, List, Type
 
 
@@ -11,7 +11,7 @@ class InfoMessage:
     speed: float
     calories: float
 
-    template_info_message = (
+    TEMPLATE_INFO_MESSAGE = (
         'Тип тренировки: {training_type}; '
         'Длительность: {duration:.3f} ч.; '
         'Дистанция: {distance:.3f} км; '
@@ -20,14 +20,7 @@ class InfoMessage:
     )
 
     def get_message(self) -> str:
-        parameters: Dict[str, str] = {
-            'training_type': self.training_type,
-            'duration': self.duration,
-            'distance': self.distance,
-            'speed': self.speed,
-            'calories': self.calories
-        }
-        return self.template_info_message.format(**parameters)
+        return self.TEMPLATE_INFO_MESSAGE.format(**asdict(self))
 
 
 class Training:
@@ -57,7 +50,10 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        raise NotImplementedError
+        raise NotImplementedError(
+            f'Переопределите метод "get_spent_calories" '
+            f'в наследнике {self.__class__.__name__}'
+        )
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -153,12 +149,10 @@ def read_package(workout_type: str, data: List[float]) -> Training:
         'RUN': Running,
         'WLK': SportsWalking
     }
-    try:
-        if workout_type in dict_trainings:
-            training_name = dict_trainings[workout_type]
-            return training_name(*data)
-    except ValueError:
-        print(f'{workout_type} is not in dict_trainings')
+    if workout_type not in dict_trainings:
+        raise ValueError(f'Нет ключа {workout_type}')
+    training_name = dict_trainings[workout_type]
+    return training_name(*data)
 
 
 def main(training: Training) -> None:
